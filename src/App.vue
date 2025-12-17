@@ -1,22 +1,22 @@
 <template>
   <div>
     <h1>Count By {{ step }}</h1>
+
     <div class="problem-line">
-      <template
-        v-for="n in 5"
-        :key="`user-input-${n}`"
-      >
+      <template v-for="(item, index) in problem.items" :key="index">
         <NumberInput
-          :modelValue="n * step"
+          v-model="item.userInput"
+          :locked="!item.missing"
           width="120px"
-          locked
         />
         <span
-          v-if="n !== 5"
+          v-if="index !== problem.items.length - 1"
           style="padding:0 10px 0 2px; font-size: 2rem;"
         >,</span>
       </template>
     </div>
+
+    <button @click="checkAnswer" style="margin-top: 20px;">Submit</button>
   </div>
 </template>
 
@@ -28,16 +28,15 @@ import randomQuestion from './randomQuestion.js'
 const step = ref(undefined)
 const min = ref(undefined)
 const max = ref(undefined)
-const length = ref(undefined)
+const sequenceLength = ref(undefined)
 const missingCount = ref(undefined)
 const problem = ref(undefined)
 
 const DEFAULT_STEP = 6
 const DEFAULT_MIN = 1
 const DEFAULT_MAX = 100
-const DEFAULT_LENGTH = 6
+const DEFAULT_SEQUENCE_LENGTH = 6
 const DEFAULT_MISSING_COUNT = 3
-
 
 onBeforeMount(() => {
   const params = new URLSearchParams(window.location.search)
@@ -53,28 +52,35 @@ onBeforeMount(() => {
     return defaultValue
   }
 
-  step.value = parseParam('count', DEFAULT_STEP, 1)
+  step.value = parseParam('countBy', DEFAULT_STEP, 1)
   min.value  = parseParam('min', DEFAULT_MIN)
   max.value  = parseParam('max', DEFAULT_MAX, min.value)
-  length.value = parseParam('length', DEFAULT_LENGTH)
+  sequenceLength.value = parseParam('sequenceLength', DEFAULT_SEQUENCE_LENGTH)
   missingCount.value = parseParam('missingCount', DEFAULT_MISSING_COUNT)
 
-
   problem.value = randomQuestion(
-      step.value,
-      min.value,
-      max.value,
-      length.value,
-      missingCount.value
-    )
+    step.value,
+    min.value,
+    max.value,
+    sequenceLength.value,
+    missingCount.value
+  )
   console.log(problem.value)
 })
 
+// Check the user's answers
+function checkAnswer() {
+  const allCorrect = problem.value.items.every(item => {
+    return !item.missing || Number(item.userInput) === item.value
+  })
 
-
+  if (allCorrect) {
+    alert('✅ Correct!')
+  } else {
+    alert('❌ Some answers are wrong. Try again!')
+  }
+}
 </script>
-
-
 
 <style>
 #app {
@@ -90,5 +96,7 @@ onBeforeMount(() => {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 </style>

@@ -1,12 +1,12 @@
 export default function randomQuestion(step, min, max, n=5, missingCount=2) {
 	// idea is to get 5 consecutive multiples of the "step" between the min and the max
 	// first, we gotta find out how many "valid" starting ones there are, that don't exceed the max
-	const effectiveMax = max - step*n // we don't want ANY choices outside the range
+	const effectiveMax = max - step*(n) // we don't want ANY choices outside the range
 	const first = randomElement(multiplesBetween(min, effectiveMax, step))
 
 	// sequence is the ramodn sequence of n consecutive multiples of step within the range
 	const sequence = [ ]
-	for (let i=0; i<=n; i++) { sequence.push(first + i*step) }
+	for (let i=0; i<n; i++) { sequence.push(first + i*step) }
 
 
 	// Randomly pick missing indices
@@ -19,12 +19,12 @@ export default function randomQuestion(step, min, max, n=5, missingCount=2) {
 
 	// Build question data
 	const items = sequence.map((value, i) => ({
-	value,
-	missing: missingIndices.includes(i),
-	userInput: missingIndices.includes(i) ? '' : value // locked numbers get prefilled
+		value,
+		missing: missingIndices.includes(i),
+		userInput: missingIndices.includes(i) ? '' : value // locked numbers get prefilled
 	}))
 
-	return items
+	return { items }
 }
 
 
